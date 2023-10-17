@@ -125,53 +125,112 @@ def main(page: ft.Page):
 
     # test 10
 
-    page.title = "Drag and Drop example"
+    # page.title = "Drag and Drop example"
 
-    def drag_accept(e):
-        # get draggable (source) control by its ID
-        src = page.get_control(e.src_id)
-        # update text inside draggable control
-        src.content.content.value = "0"
-        # update text inside drag target control
-        e.control.content.content.value = "1"
+    # def drag_accept(e):
+    #     # get draggable (source) control by its ID
+    #     src = page.get_control(e.src_id)
+    #     # update text inside draggable control
+    #     src.content.content.value = "0"
+    #     # update text inside drag target control
+    #     e.control.content.content.value = "1"
+    #     page.update()
+
+    # page.add(
+    #     ft.Row(
+    #         [
+    #             ft.Draggable(
+    #                 group="number",
+    #                 content=ft.Container(
+    #                     width=50,
+    #                     height=50,
+    #                     bgcolor=ft.colors.CYAN_200,
+    #                     border_radius=5,
+    #                     content=ft.Text("1", size=20),
+    #                     alignment=ft.alignment.center,
+    #                 ),
+    #                 content_when_dragging=ft.Container(
+    #                     width=50,
+    #                     height=50,
+    #                     bgcolor=ft.colors.BLUE_GREY_200,
+    #                     border_radius=5,
+    #                 ),
+    #                 content_feedback=ft.Text("1"),
+    #             ),                ft.Container(width=100),
+    #             ft.DragTarget(
+    #                 group="number",
+    #                 content=ft.Container(
+    #                     width=50,
+    #                     height=50,
+    #                     bgcolor=ft.colors.PINK_200,
+    #                     border_radius=5,
+    #                     content=ft.Text("0", size=20),
+    #                     alignment=ft.alignment.center,
+    #                 ),
+    #                 on_accept=drag_accept,
+    #             ),
+    #         ]
+    #     )
+    # )
+
+    # test 11
+    # page.add(ft.Text(f"Initial route: {page.route}"))
+
+    # def route_change(e: ft.RouteChangeEvent):
+    #     page.add(ft.Text(f"New route: {e.route}"))
+
+    # page.on_route_change = route_change
+    # page.update()
+
+    # test 12
+    # page.add(ft.Text(f"Initial route: {page.route}"))
+
+    # def route_change(e: ft.RouteChangeEvent):
+    #     page.add(ft.Text(f"New route: {e.route}"))
+
+    # def go_store(e):
+    #     page.route = "/store"
+    #     page.update()
+
+    # page.on_route_change = route_change
+    # page.add(ft.ElevatedButton("Go to Store", on_click=go_store))
+
+    # test 13
+
+    
+    page.title = "Routes Example"
+
+    def route_change(route):
+        page.views.clear()
+        page.views.append(
+            ft.View(
+                "/",
+                [
+                    ft.AppBar(title=ft.Text("Flet app"), bgcolor=ft.colors.SURFACE_VARIANT),
+                    ft.ElevatedButton("Visit Store", on_click=lambda _: page.go("/store")),
+                ],
+            )
+        )
+        if page.route == "/store":
+            page.views.append(
+                ft.View(
+                    "/store",
+                    [
+                        ft.AppBar(title=ft.Text("Store"), bgcolor=ft.colors.SURFACE_VARIANT),
+                        ft.ElevatedButton("Go Home", on_click=lambda _: page.go("/")),
+                    ],
+                )
+            )
         page.update()
 
-    page.add(
-        ft.Row(
-            [
-                ft.Draggable(
-                    group="number",
-                    content=ft.Container(
-                        width=50,
-                        height=50,
-                        bgcolor=ft.colors.CYAN_200,
-                        border_radius=5,
-                        content=ft.Text("1", size=20),
-                        alignment=ft.alignment.center,
-                    ),
-                    content_when_dragging=ft.Container(
-                        width=50,
-                        height=50,
-                        bgcolor=ft.colors.BLUE_GREY_200,
-                        border_radius=5,
-                    ),
-                    content_feedback=ft.Text("1"),
-                ),                ft.Container(width=100),
-                ft.DragTarget(
-                    group="number",
-                    content=ft.Container(
-                        width=50,
-                        height=50,
-                        bgcolor=ft.colors.PINK_200,
-                        border_radius=5,
-                        content=ft.Text("0", size=20),
-                        alignment=ft.alignment.center,
-                    ),
-                    on_accept=drag_accept,
-                ),
-            ]
-        )
-    )
+    def view_pop(view):
+        page.views.pop()
+        top_view = page.views[-1]
+        page.go(top_view.route)
 
-ft.app(target=main)
+    page.on_route_change = route_change
+    page.on_view_pop = view_pop
+    page.go(page.route)
+
+ft.app(target=main, view=ft.AppView.WEB_BROWSER)
  
